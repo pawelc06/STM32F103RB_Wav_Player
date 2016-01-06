@@ -37,7 +37,7 @@ void TIM2_IRQHandler() {
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
 		NEC_TimerRanOut();
-		//GPIO_ToggleBits(GPIOD, GPIO_Pin_7);
+		//GPIO_ToggleBits(GPIOD, GPIO_Pin_7);ss
 
 	}
 }
