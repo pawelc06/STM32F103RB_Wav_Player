@@ -107,6 +107,19 @@ int main(void)
 	//playWav("wav/sine_44k_8bit_stereo.wav");
 	//playWav("wav/sine_44k_16bit_stereo.wav");
 
+	mcpInit();
+
+	setResistance(1,20);
+	delay_ms(1000);
+	setResistance(1,30);
+	delay_ms(1000);
+	setResistance(1,40);
+	delay_ms(1000);
+	setResistance(1,50);
+	delay_ms(1000);
+	setResistance(1,200);
+	delay_ms(1000);
+
 #if _USE_LFN
     static char lfn[_MAX_LFN + 1];   /* Buffer to store the LFN */
     fno.lfname = lfn;
@@ -198,6 +211,12 @@ void RCC_Config(void)
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC, ENABLE);//wlacz taktowanie portu GPIO B, C (LED, LCD)
                                                                                                        //GPIO A i SPI inicjalizowane w sd_stm32.c
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1 , ENABLE);
+
+
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2 , ENABLE);
+
+
+
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1 , ENABLE);
 
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE); //wlacz taktowanie licznika TIM4
@@ -247,29 +266,41 @@ void GPIO_Config(void)
   GPIO_InitTypeDef  GPIO_InitStructure;
 
   /*Tu nalezy umiescic kod zwiazany z konfiguracja poszczegolnych portow GPIO potrzebnych w programie*/
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 ;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
   GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-  // PA4 - nSS/CS SPI
+  // PA4 - nSS/CS SPI1
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-  //SPI - SCK, MISO, MOSI
+  //SPI1 - SCK, MISO, MOSI
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-  //linia DETECT zlacza SD
+  //linia DETECT zlacza SD - nieu¿ywana
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_Init(GPIOA, &GPIO_InitStructure);
 
+  /*** SPI2 ******/
+  //SPI1 - SCK, MISO, MOSI
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13 | GPIO_Pin_15;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+    // PB12 - nSS/CS SPI2
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
 
    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;
    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
@@ -315,16 +346,16 @@ void SPI_Config(void)
 
   /*******************************************/
 
-  SPI_InitStructure.SPI_Direction =  SPI_Direction_1Line_Tx;//transmisja z wykorzystaniem jednej linii, transmisja jednokierunkowa
-    SPI_InitStructure.SPI_Mode = SPI_Mode_Master;                     //tryb pracy SPI
-    SPI_InitStructure.SPI_DataSize = SPI_DataSize_16b ;                //16-bit ramka danych
-    SPI_InitStructure.SPI_CPOL = SPI_CPOL_High;                        //stan sygnalu taktujacego przy braku transmisji - wysoki
-    SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;                      //aktywne zbocze sygnalu taktujacego - 2-gie zbocze
-    SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;                         //programowa obsluga linii NSS (CS)
-    SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8;//prescaler szybkosci tansmisji  72MHz/8=9MHz
-    SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;                //pierwszy bit w danych najbardziej znaczacy
-    SPI_InitStructure.SPI_CRCPolynomial = 7;                          //stopien wielomianu do obliczania sumy CRC
-    SPI_Init(SPI2, &SPI_InitStructure);                               //inicjalizacja SPI
+  SPI_InitStructure2.SPI_Direction =  SPI_Direction_1Line_Tx;//transmisja z wykorzystaniem jednej linii, transmisja jednokierunkowa
+    SPI_InitStructure2.SPI_Mode = SPI_Mode_Master;                     //tryb pracy SPI
+    SPI_InitStructure2.SPI_DataSize = SPI_DataSize_16b ;                //16-bit ramka danych
+    SPI_InitStructure2.SPI_CPOL = SPI_CPOL_High;                        //stan sygnalu taktujacego przy braku transmisji - wysoki
+    SPI_InitStructure2.SPI_CPHA = SPI_CPHA_2Edge;                      //aktywne zbocze sygnalu taktujacego - 2-gie zbocze
+    SPI_InitStructure2.SPI_NSS = SPI_NSS_Soft;                         //programowa obsluga linii NSS (CS)
+    SPI_InitStructure2.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8;//prescaler szybkosci tansmisji  72MHz/8=9MHz
+    SPI_InitStructure2.SPI_FirstBit = SPI_FirstBit_MSB;                //pierwszy bit w danych najbardziej znaczacy
+    SPI_InitStructure2.SPI_CRCPolynomial = 7;                          //stopien wielomianu do obliczania sumy CRC
+    SPI_Init(SPI2, &SPI_InitStructure2);                               //inicjalizacja SPI
 
     SPI_Cmd(SPI2, ENABLE);  	// Wlacz SPI1
   /********************************************/

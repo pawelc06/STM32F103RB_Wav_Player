@@ -44,6 +44,7 @@
 #include <string.h>
 
 #include "ir_decode.h"
+#include "mcp41xxx.h"
 
 #define USE_PETIT_FAT 0
 
