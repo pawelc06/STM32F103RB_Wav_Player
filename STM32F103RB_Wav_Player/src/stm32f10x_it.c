@@ -61,13 +61,13 @@ void TIM1_UP_IRQHandler(void)
 
 					rc = (uint16_t)(buffer[i][buf_idx] + 32768);
 
-					TIM4->CCR2 = ((uint16_t)lc)>>6;
-					TIM4->CCR1 = ((uint16_t)rc)>>6;
+					TIM4->CCR2 = lc>>6;
+					TIM4->CCR1 = rc>>6;
 
 
 			}
 
-			if(numChannels == 2 && bitsPerSample == 8){ //8 bit stereo
+			if(numChannels == 2 && bitsPerSample == 8){ //8 bit stereo ok
 
 								lc8 = (uint8_t) (buffer[i][buf_idx]>>8);
 
@@ -91,11 +91,11 @@ void TIM1_UP_IRQHandler(void)
 
 
 
-			if(buf_idx > SAMPLE_BUFFER_SIZE-1){
-				buf_idx=0;
-				canRead = true;
-				i ^=0x01;
-			}
+				if(buf_idx > SAMPLE_BUFFER_SIZE-1){
+					buf_idx=0;
+					canRead = true;
+					i ^=0x01;
+				}
 
 
 

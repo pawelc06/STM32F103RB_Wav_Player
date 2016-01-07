@@ -103,7 +103,9 @@ int main(void)
 
 
 	//playWav("wav/sine_22k_16bit_stereo.wav");
-
+	//playWav("wav/sine_44k_16bit_mono.wav");
+	//playWav("wav/sine_44k_8bit_stereo.wav");
+	//playWav("wav/sine_44k_16bit_stereo.wav");
 
 #if _USE_LFN
     static char lfn[_MAX_LFN + 1];   /* Buffer to store the LFN */
@@ -159,6 +161,7 @@ int main(void)
 	playWav("wav/arka/song1_8bit_stereo.wav");
 	//playWav("wav/sine_44k_8bit_stereo.wav");
 	//playWav("wav/sine_22k_8bit_stereo.wav");
+
 
 
 
@@ -295,6 +298,7 @@ void SPI_Config(void)
 {
   //konfigurowanie interfejsu SPI
   SPI_InitTypeDef   SPI_InitStructure;
+  SPI_InitTypeDef   SPI_InitStructure2;
 
   SPI_InitStructure.SPI_Direction =  SPI_Direction_2Lines_FullDuplex;//transmisja z wykorzystaniem jednej linii, transmisja jednokierunkowa
   SPI_InitStructure.SPI_Mode = SPI_Mode_Master;                     //tryb pracy SPI
@@ -308,6 +312,23 @@ void SPI_Config(void)
   SPI_Init(SPI1, &SPI_InitStructure);                               //inicjalizacja SPI
 
   SPI_Cmd(SPI1, ENABLE);  	// Wlacz SPI1
+
+  /*******************************************/
+
+  SPI_InitStructure.SPI_Direction =  SPI_Direction_1Line_Tx;//transmisja z wykorzystaniem jednej linii, transmisja jednokierunkowa
+    SPI_InitStructure.SPI_Mode = SPI_Mode_Master;                     //tryb pracy SPI
+    SPI_InitStructure.SPI_DataSize = SPI_DataSize_16b ;                //16-bit ramka danych
+    SPI_InitStructure.SPI_CPOL = SPI_CPOL_High;                        //stan sygnalu taktujacego przy braku transmisji - wysoki
+    SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;                      //aktywne zbocze sygnalu taktujacego - 2-gie zbocze
+    SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;                         //programowa obsluga linii NSS (CS)
+    SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8;//prescaler szybkosci tansmisji  72MHz/8=9MHz
+    SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;                //pierwszy bit w danych najbardziej znaczacy
+    SPI_InitStructure.SPI_CRCPolynomial = 7;                          //stopien wielomianu do obliczania sumy CRC
+    SPI_Init(SPI2, &SPI_InitStructure);                               //inicjalizacja SPI
+
+    SPI_Cmd(SPI2, ENABLE);  	// Wlacz SPI1
+  /********************************************/
+
 }
 
 void TIM_Config(uint16_t sampleRate,uint8_t bits,uint8_t numChannels) {

@@ -164,9 +164,9 @@ void playWav(uint8_t * name) {
 			if (canRead == true) {
 
 
-					//GPIO_WriteBit(GPIOC, GPIO_Pin_15, (BitAction)(1 - GPIO_ReadOutputDataBit(GPIOC, GPIO_Pin_15)));  	//LED1
+					GPIO_WriteBit(GPIOC, GPIO_Pin_15, (BitAction)(1 - GPIO_ReadOutputDataBit(GPIOC, GPIO_Pin_15)));  	//LED1
 					f_read(&plik, &buffer[i ^ 0x01][0], SAMPLE_BUFFER_SIZE*2 ,	&bytesRead);
-					//GPIO_WriteBit(GPIOC, GPIO_Pin_15, (BitAction)(1 - GPIO_ReadOutputDataBit(GPIOC, GPIO_Pin_15)));  	//LED1
+					GPIO_WriteBit(GPIOC, GPIO_Pin_15, (BitAction)(1 - GPIO_ReadOutputDataBit(GPIOC, GPIO_Pin_15)));  	//LED1
 
 					//convertBufferTo10bit(&buffer[i ^ 0x01][0]);
 
