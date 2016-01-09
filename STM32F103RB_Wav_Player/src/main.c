@@ -32,6 +32,8 @@ void SPI_Config(void);
 void TIM_Config(uint16_t sampleRate,uint8_t bits,uint8_t numChannels);
 
 bool next=false;
+bool play=true;
+volatile uint8_t volume;
 
 void TIM2_IRQHandler() {
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
@@ -51,7 +53,7 @@ void EXTI1_IRQHandler() {
 
 void NEC_ReceiveInterrupt(NEC_FRAME f) {
 	//GPIO_ToggleBits(GPIOD, GPIO_Pin_7);
-	char buf[12];
+
 
 
 
@@ -60,14 +62,18 @@ void NEC_ReceiveInterrupt(NEC_FRAME f) {
 		next=true;
 		//GPIO_ToggleBits(GPIOD, GPIO_Pin_12);
 		break;
-	case 24:
-		//GPIO_ToggleBits(GPIOD, GPIO_Pin_13);
+	case 67: //play/stop
+		play = !play;
 		break;
-	case 94:
-		//GPIO_ToggleBits(GPIOD, GPIO_Pin_14);
+	case 21: //volume up
+		if(volume+5<200)
+			volume = volume+5;
+		setResistance(1,volume);
 		break;
-	case 8:
-		//GPIO_ToggleBits(GPIOD, GPIO_Pin_15);
+	case 7: //volume down
+		if(volume-5>0)
+			volume = volume-5;
+		setResistance(1,volume);
 		break;
 	}
 
@@ -102,13 +108,22 @@ int main(void)
 	res = f_mount(&g_sFatFs,"0:0",1);
 
 
+
+
+
+	volume = 25;
+
+
+
+	mcpInit();
+	setResistance(1,volume);
+
 	//playWav("wav/sine_22k_16bit_stereo.wav");
 	//playWav("wav/sine_44k_16bit_mono.wav");
 	//playWav("wav/sine_44k_8bit_stereo.wav");
 	//playWav("wav/sine_44k_16bit_stereo.wav");
 
-	mcpInit();
-
+	/*
 	setResistance(1,20);
 	delay_ms(1000);
 	setResistance(1,30);
@@ -117,8 +132,14 @@ int main(void)
 	delay_ms(1000);
 	setResistance(1,50);
 	delay_ms(1000);
+	setResistance(1,100);
+		delay_ms(1000);
+		setResistance(1,150);
+				delay_ms(1000);
 	setResistance(1,200);
 	delay_ms(1000);
+
+	*/
 
 #if _USE_LFN
     static char lfn[_MAX_LFN + 1];   /* Buffer to store the LFN */
@@ -442,7 +463,7 @@ void TIM_Config(uint16_t sampleRate,uint8_t bits,uint8_t numChannels) {
 	  TIM_OC2PreloadConfig(TIM4, TIM_OCPreload_Enable);//wlaczenie buforowania
 
 
-	  // Wlaczenie timera
+
 
 
 	// Wlaczenie przerwan od licznikow
@@ -453,11 +474,7 @@ void TIM_Config(uint16_t sampleRate,uint8_t bits,uint8_t numChannels) {
 
 
 
-	// Wlaczenie timerow
-  TIM_Cmd(TIM1, ENABLE);
 
-
-	TIM_Cmd(TIM4, ENABLE);
 }
 
 

@@ -27,6 +27,9 @@ void playStereoSine12b();
 void playStereoSaw8b();
 void playStereoWav8b(uint8_t * name);
 
+void stopTimers(void);
+void startTimers(void);
+
 
 uint32_t DualSine12bit[32];
 

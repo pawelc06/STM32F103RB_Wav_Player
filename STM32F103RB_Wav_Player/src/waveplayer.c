@@ -22,7 +22,7 @@
 extern bool updated;
 extern uint8_t * wavPtr;
 extern uint8_t * wavPtrBegin;
-extern bool next;
+extern bool next,play;
 
 volatile uint8_t numChannels;
 
@@ -158,15 +158,25 @@ void playWav(uint8_t * name) {
 
 		  i=0;
 
+		  while(!play); //waiting for play
+
+		  startTimers();
+
 
 	while (1) {
 
-			if (canRead == true) {
+			if(play == false){
+				stopTimers();
+			} else {
+				startTimers();
+			}
+
+			if ((canRead == true) && (play == true)) {
 
 
-					GPIO_WriteBit(GPIOC, GPIO_Pin_15, (BitAction)(1 - GPIO_ReadOutputDataBit(GPIOC, GPIO_Pin_15)));  	//LED1
+					//GPIO_WriteBit(GPIOC, GPIO_Pin_15, (BitAction)(1 - GPIO_ReadOutputDataBit(GPIOC, GPIO_Pin_15)));  	//LED1
 					f_read(&plik, &buffer[i ^ 0x01][0], SAMPLE_BUFFER_SIZE*2 ,	&bytesRead);
-					GPIO_WriteBit(GPIOC, GPIO_Pin_15, (BitAction)(1 - GPIO_ReadOutputDataBit(GPIOC, GPIO_Pin_15)));  	//LED1
+					//GPIO_WriteBit(GPIOC, GPIO_Pin_15, (BitAction)(1 - GPIO_ReadOutputDataBit(GPIOC, GPIO_Pin_15)));  	//LED1
 
 					//convertBufferTo10bit(&buffer[i ^ 0x01][0]);
 
@@ -191,15 +201,24 @@ void playWav(uint8_t * name) {
 		}
 
 
+	stopTimers(); //end of song
 
-	// Wylaczenie timerow
-	  TIM_Cmd(TIM1, DISABLE);
-
-		TIM_Cmd(TIM4, DISABLE);
 
 
 	fresult = f_close(&plik);
 
 }
 
+void stopTimers(){
+	// Wylaczenie timerow
+		TIM_Cmd(TIM1, DISABLE);
 
+		TIM_Cmd(TIM4, DISABLE);
+}
+
+void startTimers(){
+	// Wylaczenie timerow
+		TIM_Cmd(TIM1, ENABLE);
+
+		TIM_Cmd(TIM4, ENABLE);
+}
