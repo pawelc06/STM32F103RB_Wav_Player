@@ -22,6 +22,7 @@
 /* Includes ------------------------------------------------------------------*/
 
 #include "main.h"
+#include "waveplayer.h"
 
 static FATFS g_sFatFs; //obiekt FATFs
 
@@ -32,7 +33,8 @@ void SPI_Config(void);
 void TIM_Config(uint16_t sampleRate,uint8_t bits,uint8_t numChannels);
 
 bool next=false;
-bool play=true;
+bool play=false;
+bool last_state;
 volatile uint8_t volume;
 
 void TIM2_IRQHandler() {
@@ -63,6 +65,7 @@ void NEC_ReceiveInterrupt(NEC_FRAME f) {
 		//GPIO_ToggleBits(GPIOD, GPIO_Pin_12);
 		break;
 	case 67: //play/stop
+
 		play = !play;
 		break;
 	case 21: //volume up
@@ -81,6 +84,7 @@ void NEC_ReceiveInterrupt(NEC_FRAME f) {
 
 
 
+
 int main(void)
 {
 
@@ -90,11 +94,12 @@ int main(void)
 	FILINFO fno;
 	DIR dir;
 	char path[20];
+
 	char *fn;   /* This function assumes non-Unicode configuration */
-	int i;
+	int i,j;
 
 	unsigned int bytesRead;
-
+	char fileNames [50][100];
 
 	RCC_Config();
 	GPIO_Config();
@@ -103,7 +108,7 @@ int main(void)
 
 	  NEC_Init();
 
-
+	  last_state = play;
 
 	res = f_mount(&g_sFatFs,"0:0",1);
 
@@ -140,6 +145,7 @@ int main(void)
 	delay_ms(1000);
 
 	*/
+j=0;
 
 #if _USE_LFN
     static char lfn[_MAX_LFN + 1];   /* Buffer to store the LFN */
@@ -170,8 +176,8 @@ int main(void)
                 path[i] = 0;
                 if (res != FR_OK) break;
             } else {                                       /* It is a file. */
-            	//strcat(path,fn);
-            	playWav(fn);
+            	strcpy(fileNames[j++],fn);
+            	//playWav(fn);
                 //printf("%s/%s\n", path, fn);
 
             }
@@ -181,6 +187,11 @@ int main(void)
     	//error
     }
   /******************************/
+
+
+    for(i=0;i<j;i++){
+    	playWav(fileNames[i]);
+    }
 
 	//playWav("wav/sine16.wav");
 	playWav("wav/tlove.wav");

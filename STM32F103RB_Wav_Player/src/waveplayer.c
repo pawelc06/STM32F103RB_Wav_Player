@@ -22,7 +22,7 @@
 extern bool updated;
 extern uint8_t * wavPtr;
 extern uint8_t * wavPtrBegin;
-extern bool next,play;
+extern bool next,play,last_state;
 
 volatile uint8_t numChannels;
 
@@ -44,7 +44,7 @@ extern FIL plik;
 volatile bool canRead;
 extern uint8_t i;
 
-volatile bool wcisniecie,last_state;
+
 
 
 
@@ -165,10 +165,14 @@ void playWav(uint8_t * name) {
 
 	while (1) {
 
-			if(play == false){
-				stopTimers();
-			} else {
-				startTimers();
+			if(play != last_state){
+				if (play == false){
+
+					stopTimers();
+				} else {
+					startTimers();
+				}
+				last_state = play;
 			}
 
 			if ((canRead == true) && (play == true)) {

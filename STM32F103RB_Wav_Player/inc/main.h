@@ -46,6 +46,7 @@
 #include "ir_decode.h"
 #include "mcp41xxx.h"
 
+
 #define USE_PETIT_FAT 0
 
 
@@ -54,6 +55,8 @@
 //#define SAMPLE_WIDTH_16 1
 //#define WAV_FROM_INT_MEMORY 1
 #define SAMPLE_BUFFER_SIZE 512
+
+
 
 
 
