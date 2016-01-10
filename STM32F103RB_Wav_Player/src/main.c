@@ -35,6 +35,7 @@ void TIM_Config(uint16_t sampleRate,uint8_t bits,uint8_t numChannels);
 bool next=false;
 bool play=false;
 bool last_state;
+bool prev=false;
 volatile uint8_t volume;
 
 void TIM2_IRQHandler() {
@@ -64,10 +65,17 @@ void NEC_ReceiveInterrupt(NEC_FRAME f) {
 		next=true;
 		//GPIO_ToggleBits(GPIOD, GPIO_Pin_12);
 		break;
+	case 68: //prev
+
+		prev=true;
+
+		break;
 	case 67: //play/stop
 
 		play = !play;
 		break;
+
+
 	case 21: //volume up
 		if(volume+5<200)
 			volume = volume+5;
@@ -82,24 +90,20 @@ void NEC_ReceiveInterrupt(NEC_FRAME f) {
 
 }
 
-
+volatile int songNum;
 
 
 int main(void)
 {
 
 	FRESULT res;
-	FIL     file1;
 
-	FILINFO fno;
-	DIR dir;
-	char path[20];
 
-	char *fn;   /* This function assumes non-Unicode configuration */
-	int i,j;
 
-	unsigned int bytesRead;
-	char fileNames [50][100];
+	int j;
+
+
+
 
 	RCC_Config();
 	GPIO_Config();
@@ -111,6 +115,8 @@ int main(void)
 	  last_state = play;
 
 	res = f_mount(&g_sFatFs,"0:0",1);
+	if(res != FR_OK)
+		return -1;
 
 
 
@@ -123,89 +129,21 @@ int main(void)
 	mcpInit();
 	setResistance(1,volume);
 
+	j=countFilesInDirectory("/wav/arka");
+
+	for(songNum=1; songNum<=j; songNum++){
+		playWavInDirectory("/wav/arka",songNum);
+			if(prev==true && songNum>1){
+				prev=false;
+				songNum-=2;
+			}
+
+	    }
+
 	//playWav("wav/sine_22k_16bit_stereo.wav");
 	//playWav("wav/sine_44k_16bit_mono.wav");
 	//playWav("wav/sine_44k_8bit_stereo.wav");
 	//playWav("wav/sine_44k_16bit_stereo.wav");
-
-	/*
-	setResistance(1,20);
-	delay_ms(1000);
-	setResistance(1,30);
-	delay_ms(1000);
-	setResistance(1,40);
-	delay_ms(1000);
-	setResistance(1,50);
-	delay_ms(1000);
-	setResistance(1,100);
-		delay_ms(1000);
-		setResistance(1,150);
-				delay_ms(1000);
-	setResistance(1,200);
-	delay_ms(1000);
-
-	*/
-j=0;
-
-#if _USE_LFN
-    static char lfn[_MAX_LFN + 1];   /* Buffer to store the LFN */
-    fno.lfname = lfn;
-    fno.lfsize = sizeof lfn;
-#endif
-
-    res = f_chdir("wav");
-    res = f_chdir("arka");
-
-    res = f_opendir(&dir, ".");                       /* Open the directory */
-    if (res == FR_OK) {
-    	strcpy(path,"/wav/arka/");
-        i = strlen(path);
-        for (;;) {
-            res = f_readdir(&dir, &fno);                   /* Read a directory item */
-            //res = f_chdir("/wav/arka/");
-            if (res != FR_OK || fno.fname[0] == 0) break;  /* Break on error or end of dir */
-            if (fno.fname[0] == '.') continue;             /* Ignore dot entry */
-#if _USE_LFN
-            fn = *fno.lfname ? fno.lfname : fno.fname;
-#else
-            fn = fno.fname;
-#endif
-            if (fno.fattrib & AM_DIR) {                    /* It is a directory */
-                //sprintf(&path[i], "/%s", fn);
-                //res = scan_files(path);
-                path[i] = 0;
-                if (res != FR_OK) break;
-            } else {                                       /* It is a file. */
-            	strcpy(fileNames[j++],fn);
-            	//playWav(fn);
-                //printf("%s/%s\n", path, fn);
-
-            }
-        }
-        f_closedir(&dir);
-    } else {
-    	//error
-    }
-  /******************************/
-
-
-    for(i=0;i<j;i++){
-    	playWav(fileNames[i]);
-    }
-
-	//playWav("wav/sine16.wav");
-	playWav("wav/tlove.wav");
-
-	playWav("wav/arka/02.wav");
-	playWav("wav/arka/07.wav");
-	playWav("wav/arka/song16bit_mono.wav"); //working
-	//playWav("wav/arka/song_1.wav"); //16 bit stereo 44kHz
-	//playWav("wav/sine_44k_16bit_stereo.wav");
-	//playWav("wav/sine_22k_16bit_stereo.wav");
-
-	playWav("wav/arka/song1_8bit_stereo.wav");
-	//playWav("wav/sine_44k_8bit_stereo.wav");
-	//playWav("wav/sine_22k_8bit_stereo.wav");
 
 
 

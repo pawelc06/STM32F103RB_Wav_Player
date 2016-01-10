@@ -20,7 +20,7 @@
 
 void convertBufferTo10bit(int16_t * buffer);
 
-void playWav(uint8_t * name);
+void playWav(char *name);
 void playWavFromMemory(uint8_t * memBuffer);
 void playWavFromIntMemory(const uint8_t * memBuffer);
 void playStereoSine12b();
@@ -29,6 +29,8 @@ void playStereoWav8b(uint8_t * name);
 
 void stopTimers(void);
 void startTimers(void);
+int playWavInDirectory(char *dirName,uint8_t number);
+uint8_t countFilesInDirectory(char *dirName);
 
 
 uint32_t DualSine12bit[32];

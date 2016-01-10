@@ -19,28 +19,18 @@
 //#define WAV_FROM_INT_MEMORY 1
 //#define SAMPLE_BUFFER_SIZE 512
 
-extern bool updated;
-extern uint8_t * wavPtr;
-extern uint8_t * wavPtrBegin;
-extern bool next,play,last_state;
+
+extern bool prev,next,play,last_state;
 
 volatile uint8_t numChannels;
 
 volatile uint8_t bitsPerSample;
 
-#ifdef SAMPLE_WIDTH_16
-	int16_t buffer[2][SAMPLE_BUFFER_SIZE];
-	//int8_t buffer[2][SAMPLE_BUFFER_SIZE];
-#else
-	#ifdef STEREO
-		uint16_t buffer[2][512];
-	#else
-		uint8_t buffer[2][512];
-	#endif
-#endif
+
+int16_t buffer[2][SAMPLE_BUFFER_SIZE];
+
 
 extern FIL plik;
-//extern UINT bytesToRead, bytesRead;
 volatile bool canRead;
 extern uint8_t i;
 
@@ -117,7 +107,7 @@ void playStereoSaw8b(){
 
 
 
-void playWav(uint8_t * name) {
+void playWav(char * name) {
 
 	FRESULT fresult;
 
@@ -190,13 +180,11 @@ void playWav(uint8_t * name) {
 						break;
 					}
 
-					/*
-					if(wcisniecie==true){
-
-						GPIO_WriteBit(GPIOC, GPIO_Pin_15, (BitAction)(1 - GPIO_ReadOutputDataBit(GPIOC, GPIO_Pin_15)));
-						//break;
+					if ((prev==true) ){
+						break;
 					}
-					*/
+
+
 
 
 
@@ -225,4 +213,116 @@ void startTimers(){
 		TIM_Cmd(TIM1, ENABLE);
 
 		TIM_Cmd(TIM4, ENABLE);
+}
+
+uint8_t countFilesInDirectory(char *dirName){
+	FRESULT res;
+	FILINFO fno;
+	DIR dir;
+
+
+		char *fn;   /* This function assumes non-Unicode configuration */
+		int i;
+
+
+		i=0;
+	#if _USE_LFN
+    static char lfn[_MAX_LFN + 1];   /* Buffer to store the LFN */
+    fno.lfname = lfn;
+    fno.lfsize = sizeof lfn;
+#endif
+
+    res = f_chdir(dirName);
+    if(res != FR_OK)
+    	return -10;
+
+    res = f_opendir(&dir, ".");                       /* Open the directory */
+    if (res == FR_OK) {
+
+
+        for (;;) {
+            res = f_readdir(&dir, &fno);                   /* Read a directory item */
+            //res = f_chdir("/wav/arka/");
+            if (res != FR_OK || fno.fname[0] == 0) break;  /* Break on error or end of dir */
+            if (fno.fname[0] == '.') continue;             /* Ignore dot entry */
+#if _USE_LFN
+            fn = *fno.lfname ? fno.lfname : fno.fname;
+#else
+            fn = fno.fname;
+#endif
+            if (fno.fattrib & AM_DIR) {                    /* It is a directory */
+                //sprintf(&path[i], "/%s", fn);
+                //res = scan_files(path);
+
+                if (res != FR_OK) break;
+            } else {                                       /* It is a file. */
+            	i++;
+            }
+        }
+        f_closedir(&dir);
+    } else {
+    	//error
+    	return -1;
+    }
+    return i;
+}
+
+int playWavInDirectory(char *dirName,uint8_t number){
+	FRESULT res;
+	FILINFO fno;
+	DIR dir;
+
+
+		char *fn;   /* This function assumes non-Unicode configuration */
+		int i;
+
+
+		i=0;
+	#if _USE_LFN
+    static char lfn[_MAX_LFN + 1];   /* Buffer to store the LFN */
+    fno.lfname = lfn;
+    fno.lfsize = sizeof lfn;
+#endif
+
+    res = f_chdir(dirName);
+    if(res != FR_OK)
+    	return -10;
+
+    res = f_opendir(&dir, ".");                       /* Open the directory */
+    if (res == FR_OK) {
+
+
+        for (;;) {
+            res = f_readdir(&dir, &fno);                   /* Read a directory item */
+            //res = f_chdir("/wav/arka/");
+            if (res != FR_OK || fno.fname[0] == 0) break;  /* Break on error or end of dir */
+            if (fno.fname[0] == '.') continue;             /* Ignore dot entry */
+#if _USE_LFN
+            fn = *fno.lfname ? fno.lfname : fno.fname;
+#else
+            fn = fno.fname;
+#endif
+            if (fno.fattrib & AM_DIR) {                    /* It is a directory */
+                //sprintf(&path[i], "/%s", fn);
+                //res = scan_files(path);
+
+                if (res != FR_OK) break;
+            } else {                                       /* It is a file. */
+            	i++;
+
+            	if(i==number){
+            		playWav(fn);
+            		f_closedir(&dir);
+            		return 0;
+            	}
+
+
+            }
+        }
+        f_closedir(&dir);
+    } else {
+    	//error
+    	return -1;
+    }
+    return 0;
 }
