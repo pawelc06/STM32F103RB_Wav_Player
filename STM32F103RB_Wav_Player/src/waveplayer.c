@@ -21,6 +21,7 @@
 
 
 extern bool prev,next,play,last_state;
+extern uint8_t numChange;
 
 volatile uint8_t numChannels;
 
@@ -180,7 +181,8 @@ void playWav(char * name) {
 						break;
 					}
 
-					if ((prev==true) ){
+					if ((prev==true) || (numChange!=0) ){
+					//if ((prev==true)  ){
 						break;
 					}
 

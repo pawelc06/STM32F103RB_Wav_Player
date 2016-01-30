@@ -36,6 +36,8 @@ bool next=false;
 bool play=false;
 bool last_state;
 bool prev=false;
+uint8_t numChange=0;
+
 volatile uint8_t volume;
 
 void TIM2_IRQHandler() {
@@ -70,6 +72,7 @@ void NEC_ReceiveInterrupt(NEC_FRAME f) {
 		prev=true;
 
 		break;
+
 	case 67: //play/stop
 
 		play = !play;
@@ -85,6 +88,36 @@ void NEC_ReceiveInterrupt(NEC_FRAME f) {
 		if(volume-5>0)
 			volume = volume-5;
 		setResistance(1,volume);
+		break;
+	case 9: //EQ - light LED
+			GPIO_WriteBit(GPIOB, GPIO_Pin_5, (BitAction)(1 - GPIO_ReadOutputDataBit(GPIOB, GPIO_Pin_5))); //D17
+			break;
+	case 12:  //number change
+		numChange = 1;
+		break;
+	case 24:
+		numChange = 2;
+		break;
+	case 94:
+		numChange = 3;
+		break;
+	case 8:
+		numChange = 4;
+		break;
+	case 28:
+		numChange = 5;
+		break;
+	case 90:
+		numChange = 6;
+		break;
+	case 66:
+		numChange = 7;
+		break;
+	case 82:
+		numChange = 8;
+		break;
+	case 74:
+		numChange = 9;
 		break;
 	}
 
@@ -138,6 +171,11 @@ int main(void)
 				songNum-=2;
 			}
 
+			if(numChange!=0){
+				songNum=numChange;
+				numChange=0;
+			}
+
 	    }
 
 	//playWav("wav/sine_22k_16bit_stereo.wav");
@@ -154,6 +192,8 @@ int main(void)
   {
   }
 }
+
+
 
 void RCC_Config(void)
 //konfigurowanie sygnalow taktujacych
@@ -236,7 +276,7 @@ void GPIO_Config(void)
   GPIO_InitTypeDef  GPIO_InitStructure;
 
   /*Tu nalezy umiescic kod zwiazany z konfiguracja poszczegolnych portow GPIO potrzebnych w programie*/
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 ;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_5 ;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
   GPIO_Init(GPIOB, &GPIO_InitStructure);
