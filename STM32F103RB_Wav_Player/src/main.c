@@ -162,6 +162,8 @@ int main(void)
 	mcpInit();
 	setResistance(1,volume);
 
+	//playWav("wav/sine_44k_16bit_mono.wav");
+
 	j=countFilesInDirectory("/wav/arka");
 
 	for(songNum=1; songNum<=j; songNum++){
@@ -172,7 +174,10 @@ int main(void)
 			}
 
 			if(numChange!=0){
-				songNum=numChange;
+				if(songNum<=j){
+					play=true;
+					songNum=numChange;
+				}
 				numChange=0;
 			}
 

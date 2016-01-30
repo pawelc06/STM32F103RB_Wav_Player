@@ -156,6 +156,10 @@ void playWav(char * name) {
 
 	while (1) {
 
+		if ((numChange!=0) ){
+			break;
+		}
+
 			if(play != last_state){
 				if (play == false){
 
@@ -181,8 +185,8 @@ void playWav(char * name) {
 						break;
 					}
 
-					if ((prev==true) || (numChange!=0) ){
-					//if ((prev==true)  ){
+
+					if ((prev==true)  ){
 						break;
 					}
 
