@@ -82,12 +82,14 @@ void NEC_ReceiveInterrupt(NEC_FRAME f) {
 	case 21: //volume up
 		if(volume+5<200)
 			volume = volume+5;
-		setResistance(1,volume);
+		//setResistance(1,volume);
+		setResistance(3,volume);
 		break;
 	case 7: //volume down
 		if(volume-5>0)
 			volume = volume-5;
-		setResistance(1,volume);
+		//setResistance(1,volume);
+		setResistance(3,volume);
 		break;
 	case 9: //EQ - light LED
 			GPIO_WriteBit(GPIOB, GPIO_Pin_5, (BitAction)(1 - GPIO_ReadOutputDataBit(GPIOB, GPIO_Pin_5))); //D17
