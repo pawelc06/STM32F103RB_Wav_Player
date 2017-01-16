@@ -138,7 +138,9 @@ int main(void)
 	int j;
 
 
-
+	if(SysTick_Config(720000ul)){
+		while(1);
+	}
 
 	RCC_Config();
 	GPIO_Config();

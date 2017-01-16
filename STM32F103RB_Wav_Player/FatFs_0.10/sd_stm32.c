@@ -65,27 +65,7 @@ void DESELECT (void) 	// CS w stan wysoki
 	GPIO_SetBits(GPIOA, GPIO_Pin_4);
 }
 
-void delay_ms(u16 zp99)
-{
-    // dla zegara 72MHz
-    u32 i=0;
-    u32 j=0;
-    for(i=0;i<zp99*8;i++)
-    {
-        for(j=0;j<3000;j++)
-        {
-            __asm volatile("nop");
-						 __asm volatile("nop");
-						  __asm volatile("nop");
-							 __asm volatile("nop");
-							  __asm volatile("nop");
-								 __asm volatile("nop");
-								  __asm volatile("nop");
-						
-						
-				}
-    }
-}
+
 
 void SPI_SD_Init( void )
 {
@@ -625,6 +605,16 @@ void disk_timerproc (void)
     n = Timer2;
     if (n) Timer2 = --n;
 
+}
+
+/**
+  * @brief  This function handles SysTick Handler.
+  * @param  None
+  * @retval None
+  */
+void SysTick_Handler(void)
+{
+	disk_timerproc();
 }
 
 /*---------------------------------------------------------*/

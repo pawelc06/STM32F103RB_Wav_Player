@@ -27,12 +27,12 @@ extern volatile bool canRead;
 
 //uint8_t buffer[2][512];
 #ifdef SAMPLE_WIDTH_16
-	extern int16_t buffer[2][512];
+	extern int16_t buffer[2][SAMPLE_BUFFER_SIZE];
 #else
 	#ifdef STEREO
-		extern uint16_t buffer[2][512];
+		extern uint16_t buffer[2][SAMPLE_BUFFER_SIZE];
 	#else
-		extern uint8_t buffer[2][512];
+		extern uint8_t buffer[2][SAMPLE_BUFFER_SIZE];
 	#endif
 #endif
 
@@ -40,8 +40,7 @@ void TIM1_UP_IRQHandler(void)
 {
 
 	static uint16_t buf_idx,lc,rc;
-	static int16_t lc1;
-	static uint8_t lc8,rc8;
+    static uint8_t lc8,rc8;
 
 	if (TIM_GetITStatus(TIM1, TIM_IT_Update) != RESET)	{   //przeladowanie licznika
 		TIM_ClearITPendingBit(TIM1, TIM_IT_Update);
@@ -194,14 +193,7 @@ void PendSV_Handler(void)
 {
 }
 
-/**
-  * @brief  This function handles SysTick Handler.
-  * @param  None
-  * @retval None
-  */
-void SysTick_Handler(void)
-{
-}
+
 
 /******************************************************************************/
 /*                 STM32F10x Peripherals Interrupt Handlers                   */
