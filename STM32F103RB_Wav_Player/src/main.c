@@ -33,7 +33,7 @@ void SPI_Config(void);
 void TIM_Config(uint16_t sampleRate,uint8_t bits,uint8_t numChannels);
 
 bool next=false;
-bool play=false;
+bool play=true;
 bool last_state;
 bool prev=false;
 uint8_t numChange=0;
@@ -121,6 +121,8 @@ void NEC_ReceiveInterrupt(NEC_FRAME f) {
 	case 74:
 		numChange = 9;
 		break;
+	default:
+		break;
 	}
 
 }
@@ -142,12 +144,17 @@ int main(void)
 		while(1);
 	}
 
+
+
 	RCC_Config();
 	GPIO_Config();
+
 	NVIC_Config();
 	SPI_Config();
 
-	  NEC_Init();
+	NEC_Init();
+
+
 
 	  last_state = play;
 
