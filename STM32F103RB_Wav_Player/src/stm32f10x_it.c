@@ -47,7 +47,7 @@ void TIM1_UP_IRQHandler(void)
 
 
 
-			GPIO_WriteBit(GPIOC, GPIO_Pin_15, (BitAction)(1 - GPIO_ReadOutputDataBit(GPIOC, GPIO_Pin_15)));  	//LED1
+			//GPIO_WriteBit(GPIOC, GPIO_Pin_15, (BitAction)(1 - GPIO_ReadOutputDataBit(GPIOC, GPIO_Pin_15)));  	//LED1
 
 
 

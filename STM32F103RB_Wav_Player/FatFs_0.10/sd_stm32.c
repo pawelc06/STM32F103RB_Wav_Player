@@ -45,7 +45,7 @@ static volatile
 DSTATUS Stat = STA_NOINIT;    /* Disk status */
 
 static volatile
-BYTE Timer1, Timer2;    /* 100Hz decrement timer */
+BYTE Timer1, Timer2,dTimer;    /* 100Hz decrement timer */
 
 static
 BYTE CardType;            /* b0:MMC, b1:SDC, b2:Block addressing */
@@ -607,15 +607,7 @@ void disk_timerproc (void)
 
 }
 
-/**
-  * @brief  This function handles SysTick Handler.
-  * @param  None
-  * @retval None
-  */
-void SysTick_Handler(void)
-{
-	disk_timerproc();
-}
+
 
 /*---------------------------------------------------------*/
 /* User Provided Timer Function for FatFs module           */
@@ -634,6 +626,12 @@ DWORD get_fattime (void)
             | (0U << 5)              // Min = 00
             | (0U >> 1)              // Sec = 00
             ;
+
+}
+
+void SysTick_Handler(void)
+{
+	disk_timerproc();
 
 }
 

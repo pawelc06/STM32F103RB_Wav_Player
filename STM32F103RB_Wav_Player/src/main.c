@@ -24,6 +24,7 @@
 #include "main.h"
 #include "waveplayer.h"
 
+
 static FATFS g_sFatFs; //obiekt FATFs
 
 void GPIO_Config(void);
@@ -33,7 +34,7 @@ void SPI_Config(void);
 void TIM_Config(uint16_t sampleRate,uint8_t bits,uint8_t numChannels);
 
 bool next=false;
-bool play=true;
+bool play=false;
 bool last_state;
 bool prev=false;
 uint8_t numChange=0;
@@ -140,9 +141,12 @@ int main(void)
 	int j;
 
 
-	if(SysTick_Config(720000ul)){
+	if(SysTick_Config(720000ul)){ //10 ms
 		while(1);
 	}
+
+
+
 
 
 
@@ -152,11 +156,12 @@ int main(void)
 	NVIC_Config();
 	SPI_Config();
 
+	last_state = play;
 	NEC_Init();
 
 
 
-	  last_state = play;
+
 
 	res = f_mount(&g_sFatFs,"0:0",1);
 	if(res != FR_OK)
@@ -378,12 +383,12 @@ void SPI_Config(void)
     SPI_InitStructure2.SPI_CPOL = SPI_CPOL_High;                        //stan sygnalu taktujacego przy braku transmisji - wysoki
     SPI_InitStructure2.SPI_CPHA = SPI_CPHA_2Edge;                      //aktywne zbocze sygnalu taktujacego - 2-gie zbocze
     SPI_InitStructure2.SPI_NSS = SPI_NSS_Soft;                         //programowa obsluga linii NSS (CS)
-    SPI_InitStructure2.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8;//prescaler szybkosci tansmisji  72MHz/8=9MHz
+    SPI_InitStructure2.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4;//prescaler szybkosci tansmisji  72MHz/4=9MHz
     SPI_InitStructure2.SPI_FirstBit = SPI_FirstBit_MSB;                //pierwszy bit w danych najbardziej znaczacy
     SPI_InitStructure2.SPI_CRCPolynomial = 7;                          //stopien wielomianu do obliczania sumy CRC
     SPI_Init(SPI2, &SPI_InitStructure2);                               //inicjalizacja SPI
 
-    SPI_Cmd(SPI2, ENABLE);  	// Wlacz SPI1
+    SPI_Cmd(SPI2, ENABLE);  	// Wlacz SPI2
   /********************************************/
 
 }
