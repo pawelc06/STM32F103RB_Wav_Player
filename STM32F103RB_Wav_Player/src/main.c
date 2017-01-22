@@ -146,7 +146,10 @@ int main(void)
 
 
 
-	int j;
+	uint8_t j,k;
+	uint8_t dNumber;
+	char currentDirName[20];
+	char fullCurrentDirName[25];
 
 
 	if(SysTick_Config(720000ul)){ //10 ms
@@ -188,10 +191,19 @@ int main(void)
 
 	//playWav("wav/sine_44k_16bit_mono.wav");
 
-	j=countFilesInDirectory("/wav/arka");
+
+	dNumber = countDirs("/wav");
+
+	k = getSubDirByNumber(0,"/wav",currentDirName);
+	//k = getSubDirByNumber(1,"/wav",currentDirName);
+
+	strcpy(fullCurrentDirName,"/wav/");
+	strcat(fullCurrentDirName,currentDirName);
+
+	j=countFilesInDirectory(fullCurrentDirName);
 
 	for(songNum=1; songNum<=j; songNum++){
-		playWavInDirectory("/wav/arka",songNum);
+		playWavInDirectory(fullCurrentDirName,songNum);
 			if(prev==true && songNum>1){
 				prev=false;
 				songNum-=2;
@@ -391,7 +403,7 @@ void SPI_Config(void)
     SPI_InitStructure2.SPI_CPOL = SPI_CPOL_High;                        //stan sygnalu taktujacego przy braku transmisji - wysoki
     SPI_InitStructure2.SPI_CPHA = SPI_CPHA_2Edge;                      //aktywne zbocze sygnalu taktujacego - 2-gie zbocze
     SPI_InitStructure2.SPI_NSS = SPI_NSS_Soft;                         //programowa obsluga linii NSS (CS)
-    SPI_InitStructure2.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4;//prescaler szybkosci tansmisji  72MHz/8=9MHz
+    SPI_InitStructure2.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16;//prescaler szybkosci tansmisji  72MHz/8=9MHz
     SPI_InitStructure2.SPI_FirstBit = SPI_FirstBit_MSB;                //pierwszy bit w danych najbardziej znaczacy
     SPI_InitStructure2.SPI_CRCPolynomial = 7;                          //stopien wielomianu do obliczania sumy CRC
     SPI_Init(SPI2, &SPI_InitStructure2);                               //inicjalizacja SPI

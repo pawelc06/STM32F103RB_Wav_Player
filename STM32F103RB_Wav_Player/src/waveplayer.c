@@ -221,6 +221,55 @@ void startTimers(){
 		TIM_Cmd(TIM4, ENABLE);
 }
 
+uint8_t countDirs(char *dirName){
+	FRESULT res;
+	FILINFO fno;
+	DIR dir;
+
+
+		char *fn;   /* This function assumes non-Unicode configuration */
+		int i;
+
+
+		i=0;
+	#if _USE_LFN
+    static char lfn[_MAX_LFN + 1];   /* Buffer to store the LFN */
+    fno.lfname = lfn;
+    fno.lfsize = sizeof lfn;
+#endif
+
+    res = f_chdir(dirName);
+    if(res != FR_OK)
+    	return -10;
+
+    res = f_opendir(&dir, ".");                       /* Open the directory */
+    if (res == FR_OK) {
+
+
+        for (;;) {
+            res = f_readdir(&dir, &fno);                   /* Read a directory item */
+
+            if (res != FR_OK || fno.fname[0] == 0) break;  /* Break on error or end of dir */
+            if (fno.fname[0] == '.') continue;             /* Ignore dot entry */
+#if _USE_LFN
+            fn = *fno.lfname ? fno.lfname : fno.fname;
+#else
+            fn = fno.fname;
+#endif
+            if (fno.fattrib & AM_DIR) {                    /* It is a directory */
+            	if (res != FR_OK) break;
+            	i++;
+            }
+        }
+
+        f_closedir(&dir);
+    } else {
+    	//error
+    	return -1;
+    }
+    return i;
+}
+
 uint8_t countFilesInDirectory(char *dirName){
 	FRESULT res;
 	FILINFO fno;
@@ -270,6 +319,57 @@ uint8_t countFilesInDirectory(char *dirName){
     	//error
     	return -1;
     }
+    return i;
+}
+
+uint8_t getSubDirByNumber(uint8_t n,char * dirName,char * subDirName){
+	FRESULT res;
+	FILINFO fno;
+	DIR dir;
+
+
+		char *fn;   /* This function assumes non-Unicode configuration */
+		int i;
+
+
+		i=0;
+	#if _USE_LFN
+    static char lfn[_MAX_LFN + 1];   /* Buffer to store the LFN */
+    fno.lfname = lfn;
+    fno.lfsize = sizeof lfn;
+#endif
+
+    res = f_chdir(dirName);
+    if(res != FR_OK)
+    	return -10;
+
+    res = f_opendir(&dir, ".");                       /* Open the directory */
+    if (res == FR_OK) {
+
+
+        for (;;) {
+            res = f_readdir(&dir, &fno);                   /* Read a directory item */
+
+            if (res != FR_OK || fno.fname[0] == 0) break;  /* Break on error or end of dir */
+            if (fno.fname[0] == '.') continue;             /* Ignore dot entry */
+#if _USE_LFN
+            fn = *fno.lfname ? fno.lfname : fno.fname;
+#else
+            fn = fno.fname;
+#endif
+            if (fno.fattrib & AM_DIR) {                    /* It is a directory */
+            	if (res != FR_OK) break;
+            	if(i == n) break;
+            	i++;
+            }
+        }
+
+        f_closedir(&dir);
+    } else {
+    	//error
+    	return -1;
+    }
+    strcpy(subDirName,fn);
     return i;
 }
 

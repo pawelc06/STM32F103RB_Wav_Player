@@ -31,6 +31,8 @@ void stopTimers(void);
 void startTimers(void);
 int playWavInDirectory(char *dirName,uint8_t number);
 uint8_t countFilesInDirectory(char *dirName);
+uint8_t countDirs(char *dirName);
+uint8_t getSubDirByNumber(uint8_t n,char * dirName,char * subDirName);
 
 
 uint32_t DualSine12bit[32];
