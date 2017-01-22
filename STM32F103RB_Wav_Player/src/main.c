@@ -37,6 +37,10 @@ bool next=false;
 bool play=true;
 bool last_state;
 bool prev=false;
+
+bool prevSubDir=false;
+bool nextSubDir=false;
+
 uint8_t numChange=0;
 
 volatile uint8_t volume;
@@ -122,14 +126,18 @@ void NEC_ReceiveInterrupt(NEC_FRAME f) {
 	case 74:
 		numChange = 9;
 		break;
-		/*
+
 	case 69:
 			//CH-
+			prevSubDir=true;
+
 			break;
-	case 70:
+	case 71:
 			//CH+
+			nextSubDir=true;
+
 			break;
-			*/
+
 	default:
 		break;
 	}
@@ -195,18 +203,37 @@ int main(void)
 	dNumber = countDirs("/wav");
 
 	k = getSubDirByNumber(0,"/wav",currentDirName);
-	//k = getSubDirByNumber(1,"/wav",currentDirName);
-
 	strcpy(fullCurrentDirName,"/wav/");
 	strcat(fullCurrentDirName,currentDirName);
 
 	j=countFilesInDirectory(fullCurrentDirName);
 
 	for(songNum=1; songNum<=j; songNum++){
-		playWavInDirectory(fullCurrentDirName,songNum);
+
+			playWavInDirectory(fullCurrentDirName,songNum);
 			if(prev==true && songNum>1){
 				prev=false;
 				songNum-=2;
+			}
+
+			if(nextSubDir){
+				if(++k<dNumber){
+					k = getSubDirByNumber(k,"/wav",currentDirName);
+					strcpy(fullCurrentDirName,"/wav/");
+					strcat(fullCurrentDirName,currentDirName);
+					numChange=1;
+				}
+				nextSubDir=false;
+			}
+
+			if(prevSubDir){
+				if(--k>=0){
+					k = getSubDirByNumber(k,"/wav",currentDirName);
+					strcpy(fullCurrentDirName,"/wav/");
+					strcat(fullCurrentDirName,currentDirName);
+					numChange=1;
+				}
+				prevSubDir=false;
 			}
 
 			if(numChange!=0){

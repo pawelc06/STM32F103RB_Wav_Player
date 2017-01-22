@@ -20,7 +20,7 @@
 //#define SAMPLE_BUFFER_SIZE 512
 
 
-extern bool prev,next,play,last_state;
+extern bool prev,next,play,last_state,prevSubDir,nextSubDir;
 extern uint8_t numChange;
 
 volatile uint8_t numChannels;
@@ -186,7 +186,7 @@ void playWav(char * name) {
 					}
 
 
-					if ((prev==true)  ){
+					if (prev || nextSubDir || prevSubDir ){
 						break;
 					}
 
