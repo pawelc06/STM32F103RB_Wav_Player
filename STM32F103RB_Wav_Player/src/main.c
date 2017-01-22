@@ -34,7 +34,7 @@ void SPI_Config(void);
 void TIM_Config(uint16_t sampleRate,uint8_t bits,uint8_t numChannels);
 
 bool next=false;
-bool play=false;
+bool play=true;
 bool last_state;
 bool prev=false;
 uint8_t numChange=0;
@@ -122,6 +122,14 @@ void NEC_ReceiveInterrupt(NEC_FRAME f) {
 	case 74:
 		numChange = 9;
 		break;
+		/*
+	case 69:
+			//CH-
+			break;
+	case 70:
+			//CH+
+			break;
+			*/
 	default:
 		break;
 	}
@@ -383,7 +391,7 @@ void SPI_Config(void)
     SPI_InitStructure2.SPI_CPOL = SPI_CPOL_High;                        //stan sygnalu taktujacego przy braku transmisji - wysoki
     SPI_InitStructure2.SPI_CPHA = SPI_CPHA_2Edge;                      //aktywne zbocze sygnalu taktujacego - 2-gie zbocze
     SPI_InitStructure2.SPI_NSS = SPI_NSS_Soft;                         //programowa obsluga linii NSS (CS)
-    SPI_InitStructure2.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4;//prescaler szybkosci tansmisji  72MHz/4=9MHz
+    SPI_InitStructure2.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4;//prescaler szybkosci tansmisji  72MHz/8=9MHz
     SPI_InitStructure2.SPI_FirstBit = SPI_FirstBit_MSB;                //pierwszy bit w danych najbardziej znaczacy
     SPI_InitStructure2.SPI_CRCPolynomial = 7;                          //stopien wielomianu do obliczania sumy CRC
     SPI_Init(SPI2, &SPI_InitStructure2);                               //inicjalizacja SPI
