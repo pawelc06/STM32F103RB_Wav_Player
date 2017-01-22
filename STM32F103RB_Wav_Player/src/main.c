@@ -221,8 +221,9 @@ int main(void)
 					k = getSubDirByNumber(k,"/wav",currentDirName);
 					strcpy(fullCurrentDirName,"/wav/");
 					strcat(fullCurrentDirName,currentDirName);
-					numChange=1;
+
 				}
+				numChange=1;
 				nextSubDir=false;
 			}
 
@@ -231,8 +232,9 @@ int main(void)
 					k = getSubDirByNumber(k,"/wav",currentDirName);
 					strcpy(fullCurrentDirName,"/wav/");
 					strcat(fullCurrentDirName,currentDirName);
-					numChange=1;
+
 				}
+				numChange=1;
 				prevSubDir=false;
 			}
 
