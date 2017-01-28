@@ -215,7 +215,7 @@ void stopTimers(){
 }
 
 void startTimers(){
-	// Wylaczenie timerow
+	// Wlaczenie timerow
 		TIM_Cmd(TIM1, ENABLE);
 
 		TIM_Cmd(TIM4, ENABLE);

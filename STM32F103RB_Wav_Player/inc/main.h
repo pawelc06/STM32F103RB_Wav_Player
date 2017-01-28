@@ -57,7 +57,13 @@
 #define SAMPLE_BUFFER_SIZE 512
 
 
-
+void GPIO_Config(void);
+void RCC_Config(void);
+void NVIC_Config(void);
+void SPI_Config(void);
+void TIM_Config(uint16_t sampleRate, uint8_t bits, uint8_t numChannels);
+void TIM3_Config(uint8_t initPulse);
+void PWM_SetDC(uint16_t channel,uint16_t dutycycle);
 
 
 
